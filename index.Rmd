@@ -1,0 +1,140 @@
+---
+title: "SQL"
+output: html_document
+---
+
+## Filtering Rows and Columns 
+
+With SQL, you can filter columns with SELECT 
+and rows with WHERE.Let's look at an example 
+using the Lahman baseball database. First, we need
+to load some packages
+```{r warning=FALSE,message=FALSE}
+library(Lahman)
+library(sqldf)
+```
+
+Suppoose we want to see the HR
+totals for the 1927 Yankees. 
+We could write the following:
+```{r}
+query <- "SELECT playerID, yearID, teamID, HR FROM Batting
+WHERE teamID='NYA' and yearID=1927"
+sqldf(query)
+```
+
+## Further SQL Knowledge
+Today we learned more extensive SQL commands
+along with ordering our querys by certain catagories.
+
+Here is an example a selective SQL query using homeruns (HR) and the teamID of the New York Yankees:
+```{r}
+query <- "SELECT playerID, teamID, yearID, HR FROM Batting
+WHERE teamID='NYA' and HR>=40"
+sqldf(query)
+```
+
+Also, we learned hot set greater than and less than parameters within a query:
+```{r}
+query2 <- query <- "SELECT playerID, teamID, yearID, HR, SO FROM Batting
+WHERE SO<60 and HR>40"
+sqldf(query2)
+```
+
+Here is another example demonstrating greater than or equal to and less than or equal to filters within a query: 
+```{r}
+query3 <- "SELECT playerID, teamID, yearID, HR FROM Batting
+WHERE teamID='PHI' and HR>30 and yearID>=1970 and yearID<=1979"
+sqldf(query3)
+```
+
+Along with those previous functions, we also learned how to order our results using the ORDER BY query function. Notice that there is a DESC portion of that code that orders our results in a descending fashion:
+```{r}
+query4 <- "SELECT playerID, yearID, teamID, HR FROM Batting 
+WHERE HR>50
+ORDER BY HR DESC"
+sqldf(query4)
+```
+
+We can also use the ASC command after the ORDER BY funtion within the query to order our results in a ascending fashion:
+```{r}
+query5 <- "SELECT playerId, teamID, yearID, SO FROM Batting
+WHERE SO<10 and AB>=400
+ORDER BY SO ASC"
+sqldf(query5)
+```
+##Aggregation
+
+Aggregation allows you to group the data. Using GROUP BY will perform the command. There a multiple ways to Group the data:
+
+*sum(colname) gives you the sum
+
+*avg(colname) gives you the average
+
+*max(colname) gives you the maximum
+
+*min(colname) gives you the minimum
+
+#### Examples
+##### #1
+```{r}
+query<-"SELECT playerID, sum(HR) 
+FROM Batting 
+WHERE playerID='ruthba01' 
+GROUP BY playerID" 
+
+sqldf(query) 
+```
+##### #2
+```{r}
+query<-"SELECT playerID, sum(HR)
+FROM Batting 
+GROUP BY playerID 
+HAVING sum(HR)>=600 
+ORDER BY sum(HR) DESC" 
+
+sqldf(query) 
+```
+##### #3
+```{r}
+query<-"SELECT playerID, avg(HR)
+FROM Batting 
+GROUP BY playerID 
+HAVING avg(HR)>30 
+ORDER BY avg(HR) DESC" 
+
+sqldf(query)
+```
+## Joining
+Joining allows data from multiple tables to be used together by using the commands INNER JOIN and ON. 
+
+#### Examples
+##### #1
+```{r}
+query<-"SELECT nameFIRST, nameLAST, teamID, yearID, HR  
+FROM Batting INNER JOIN Master 
+ON Batting.playerID=Master.playerID 
+WHERE Batting.playerID='ruthba01'" 
+
+sqldf(query) 
+```
+##### #2
+```{r}
+query<-"SELECT nameFirst,nameLast,teamID,yearID,HR 
+FROM Batting INNER JOIN Master 
+ON Batting.playerID=Master.playerID 
+WHERE Batting.HR>50
+ORDER BY HR DESC" 
+
+sqldf(query) 
+```
+##### #3
+```{r}
+query<-"SELECT playerID,name,Batting.yearID,Batting.HR 
+FROM Batting INNER JOIN Teams 
+ON Batting.teamID=Teams.teamID and Batting.yearID=Teams.yearID 
+WHERE playerID='ruthba01'" 
+
+sqldf(query) 
+```
+
